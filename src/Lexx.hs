@@ -27,13 +27,13 @@ module Lexx
 import Control.Monad.State
 import Control.Monad.Writer
 import qualified Data.ByteString as S
-import qualified Data.ByteString.Char8 as S8
 import qualified Data.ByteString.Lazy as L
 import Data.Char
 import Data.Maybe
 import Data.String
 import Data.Time
 import Lucid
+import System.IO
 import Rainbow
 
 -- | Commands are actions that the renderer will do.
@@ -160,11 +160,12 @@ prettyWrite x =
     (do now <- getCurrentTime
         write now x)
   where
-    write now = S8.putStrLn . prettyPrintTerm now
+    write now = S.hPutStr stdout . prettyPrintTerm now
 
-prettyPrintTerm :: (Show a) => UTCTime -> a -> S8.ByteString
+prettyPrintTerm :: (Show a) => UTCTime -> a -> S.ByteString
 prettyPrintTerm now =
   S.concat .
+  (<> ["\n"]) .
   Rainbow.chunksToByteStrings Rainbow.toByteStringsColors8 .
   ([Rainbow.underline (Rainbow.bold (fromString (show now))), "\n"] <>) .
   Lexx.commandsToRainbow . Lexx.lexx . show
@@ -175,11 +176,12 @@ prettyWriteLimited limit x =
     (do now <- getCurrentTime
         write now x)
   where
-    write now = S8.putStrLn . prettyPrintTermLimited limit now
+    write now = S.hPutStr stdout . prettyPrintTermLimited limit now
 
-prettyPrintTermLimited :: (Show a) => Int -> UTCTime -> a -> S8.ByteString
+prettyPrintTermLimited :: (Show a) => Int -> UTCTime -> a -> S.ByteString
 prettyPrintTermLimited limit now =
   S.concat .
+  (<> ["\n"]) .
   Rainbow.chunksToByteStrings Rainbow.toByteStringsColors8 .
   ([Rainbow.underline (Rainbow.bold (fromString (show now))), "\n"] <>) .
   Lexx.commandsToRainbow . Lexx.lexx . take limit . show
