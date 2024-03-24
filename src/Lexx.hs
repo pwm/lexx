@@ -24,6 +24,7 @@ module Lexx
   , commandsToRainbow
   ) where
 
+import Control.Monad (unless)
 import Control.Monad.State
 import Control.Monad.Writer
 import qualified Data.ByteString as S
